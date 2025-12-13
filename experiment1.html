@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="./style/base.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<title>E·X·P·E·R·I·M·E·N·T</title>
+</head>
+<body class="amber bg-cathode">
+<main></main>
+<span class="blink">█</span>
+<script>
+    const maxCols = 8;
+    const maxRows = 30;
+
+    const dataGrid = document.getElementsByTagName('main')[0]
+        .appendChild(document.createElement('div'));
+
+    const appendCell = (data) => dataGrid.appendChild(
+        (cell => [cell, cell.innerText = data][0])(document.createElement('p')));
+        
+    const appendRow = () => [...Array(maxCols)].map(() => appendCell(randomValue()));
+    const unshiftCell = () => dataGrid.removeChild(dataGrid.getElementsByTagName('p')[0]);
+    const unshiftRow = () => [...Array(maxCols)].map(unshiftCell);
+
+    const randomFloatValue = (scale = 1, precision = 6) => (Math.random() * 10 ** scale).toLocaleString(
+        undefined,
+        { maximumFractionDigits: precision, minimumFractionDigits: precision },
+    );
+
+    const randomHexWord = (digits = 8) => Math.floor((Math.random() * 16 ** digits)).toString(16)
+        .padStart(digits, '0')
+        .toUpperCase();
+
+    const randomString = (letters = 8) => Math.floor((Math.random() * 36 ** letters)).toString(36)
+        .padStart(letters, '_')
+        .toUpperCase();
+
+    // const randomValue = () => randomFloatValue();
+    // const randomValue = () => randomHexWord();
+    const randomValue = () => randomString();
+
+    dataGrid.setAttribute('class', `grid grid-cols-${maxCols} gap-1 text-right`);
+
+    window.addEventListener('load', function () {
+        [...Array(maxRows)].map(appendRow);
+        window.setInterval(() => unshiftRow() && appendRow(), 250);
+        // window.setInterval(() => unshiftCell() && appendCell(), 250);
+    });
+</script>
+</body>
+</html>

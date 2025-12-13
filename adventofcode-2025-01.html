@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="./style/base.css">
+<script src="./js/utility.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+    button {
+        @apply border-1 border-gray-300 cursor-pointer px-2 rounded-lg;
+    }
+    button:hover {
+        @apply bg-white border-white text-gray-700
+    }
+    input, textarea {
+        @apply border-1 px-2 py-1 rounded-lg;
+    }
+</style>
+<title>Advent of Code</title>
+</head>
+<body class="cyan bg-cathode">
+<main>
+    <h2><a href="https://adventofcode.com/2025/day/1">Day 1</a>: Secret Entrance</h2>
+
+    <div class="flex items-center gap-4 mb-4">
+        <div>
+            <button class="text-3xl text-white" id="fetch">-></button>
+        </div>
+        <div>
+            <textarea class="w-16" id="input" rows="10">
+L68
+L30
+R48
+L5
+R60
+L55
+L1
+L99
+R14
+L82
+            </textarea>
+        </div>
+        <div>
+            <p id="output"></p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-1" id="trace"></div>
+</main>
+<script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+
+    const solve = () => input.value
+        .replace(/L/g, '-')
+        .replace(/R/g, '+')
+        .split(/\s+/)
+        .filter(s => s > '')
+        .map(s => Number.parseInt(s))
+        .reduce(({start, total = 0}, rotate) =>
+            (stop =>
+                (clicks => ({
+                    start: stop,
+                    total: total + clicks,
+                    _: trace(start, rotate, stop, clicks),
+                }))(
+                    // stop === 0 ? 1 : 0, // part 1 - count only stop on 00
+                    rotate < 0 // part 2 - password method 0x434C49434B (CLICK)
+                        ? Math.floor((start + rotate) / -100) + (start === 0 ? 0 : 1)
+                        : Math.floor((start + rotate) / 100),
+                )
+            )( (start + rotate + 10000) % 100 ), {start: 50})
+        .total;
+
+    function trace(start, rotate, stop, clicks) {
+        const cell = document.createElement('p');
+        
+        if (clicks > 3) {
+            cell.setAttribute('class', 'amber');
+        } else if (clicks > 0) {
+            cell.setAttribute('class', 'green');
+        }
+
+        const step = start + rotate;
+
+        cell.innerText = start.toString().padStart(2, '0')
+            + (rotate < 0 ? ' - ' : ' + ')
+            + Math.abs(rotate).toString().padEnd(3, ' ')
+            + (step === stop ? '      ' : ' =' + step.toString().padStart(4, ' '))
+            + '->' + stop.toString().padStart(2, '0')
+            + ' ' + parenNumber(clicks)
+            + ' ' + hbar(clicks)
+        ;
+        
+        document.getElementById('trace').appendChild(cell);
+    }
+
+    input.addEventListener('change', () => output.innerText = ' = ' + solve);
+
+    const source = './2025/day/1/input.txt'; // 'https://adventofcode.com/2025/day/1/input';
+
+    document.getElementById('fetch').addEventListener('click', () => fetch(source)
+        .then(response => response.text())
+        .then(text => [
+            input.value = text,
+            output.innerText = ' = ' + solve(),
+        ]));
+
+    output.innerText = ' = ' + solve();
+    // part one: 1029
+    // part two: 5892
+    // next: https://adventofcode.com/2025/day/2
+</script>
+</body>
+</html>
